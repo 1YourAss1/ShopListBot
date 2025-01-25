@@ -1,3 +1,13 @@
+# Properties
+1. Add to `/path/to/tomcat/conf/catalina.properties`:
+```xml
+shared.loader=${catalina.base}/shared/classes
+```
+2. Add bot properties to `/path/to/tomcat/shared/classes/shop-list-bot-global.properties`:
+```xml
+shop.list.bot.token=<telegram-bot-token>
+shop.list.bot.webhook.url=<server-domain-name>/shop-list-bot/webhook
+```
 # Deploy
 1. Add user in `/path/to/tomcat/conf/tomcat-users.xml`:
 
