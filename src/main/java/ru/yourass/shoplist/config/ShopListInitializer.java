@@ -7,7 +7,7 @@ public class ShopListInitializer extends AbstractAnnotationConfigDispatcherServl
     @Override
     protected Class<?>[] getRootConfigClasses() {
         return null;
-    }; 
+    }
     
     @Override
     protected Class<?>[] getServletConfigClasses() {

@@ -16,6 +16,11 @@
             <artifactId>spring-webmvc</artifactId>
             <version>6.2.2</version>
         </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.18.2</version>
+        </dependency>
         <!-- Servlet API -->
         <dependency>
             <groupId>jakarta.servlet</groupId>
@@ -34,7 +39,13 @@
             <artifactId>logback-classic</artifactId>
             <version>1.5.16</version>
         </dependency>
-
+        <!-- Lombok --> 
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.36</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -44,30 +55,8 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <version>3.3.2</version> 
             </plugin>
-            <plugin>
-                <groupId>org.apache.tomcat.maven</groupId>
-                <artifactId>tomcat7-maven-plugin</artifactId>
-                <version>2.2</version>
-                <configuration>
-                    <url>${tomcat.url}</url>
-                    <server>${tomcat.server}</server>
-                    <path>/${project.artifactId}</path>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
-    
-    <profiles>
-        <profile>
-            <id>local</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <properties>
-                <tomcat.url>http://localhost:8080/manager/text</tomcat.url>
-                <tomcat.server>local-tomcat</tomcat.server>
-            </properties>
-        </profile>
-    </profiles>
+
 </project>
 
