@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Optional;
-
 @Getter
 @Setter
 public class Update {
@@ -15,13 +13,9 @@ public class Update {
     @JsonProperty("message")
     private Message message;
 
-    public Optional<String> getText() {
-        return Optional.ofNullable(message).map(Message::getText);
-    }
-
     @Getter
     @Setter
-    private static class Message {
+    static class Message {
         @JsonProperty("text")
         private String text;
     }

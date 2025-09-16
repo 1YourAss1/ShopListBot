@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,6 +17,8 @@ import jakarta.annotation.PostConstruct;
 @Controller
 public class ShopListController {
     private static final Logger logger = LoggerFactory.getLogger(ShopListController.class);
+
+    private final ItemRepository itemRepository = new ItemRepository();
     
     private final RestTemplate restTemplate;
     
@@ -42,12 +45,14 @@ public class ShopListController {
     
     @PostMapping(value = "/webhook")
     public ResponseEntity<HttpStatus> handleWebhook(@RequestBody Update update) {
-        logger.info("Received webhook update: {}", update.getText().orElse(""));
+        int id = itemRepository.getAll().size() + 1;
+        itemRepository.save(new ItemDto(String.valueOf(id), update.getMessage().getText(), false));
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping(value = "/hello")
-    public String hello() {
-        return "hello";
+    @GetMapping(value = "/")
+    public String shopList(Model model) {
+        model.addAttribute("items", itemRepository.getAll());
+        return "shop-list";
     }
 }
