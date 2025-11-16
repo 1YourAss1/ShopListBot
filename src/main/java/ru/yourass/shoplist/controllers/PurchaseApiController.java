@@ -24,7 +24,7 @@ public class PurchaseApiController {
     @GetMapping(path = "/purchases/{userId}")
     public ResponseEntity<List<Purchase>> getPurchases(@PathVariable("userId") Long userId) {
         try {
-            return ResponseEntity.ok(shopListService.getPurchasesByUserId(userId));
+            return ResponseEntity.ok(shopListService.getPurchasesByUserId(userId, true));
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Server error", e);
         }

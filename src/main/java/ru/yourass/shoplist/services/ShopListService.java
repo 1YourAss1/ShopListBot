@@ -1,8 +1,10 @@
 package ru.yourass.shoplist.services;
 
 import org.springframework.stereotype.Service;
+import ru.yourass.shoplist.dao.ProductDAO;
 import ru.yourass.shoplist.dao.PurchaseDAO;
 import ru.yourass.shoplist.dao.UserDAO;
+import ru.yourass.shoplist.model.Product;
 import ru.yourass.shoplist.model.Purchase;
 import ru.yourass.shoplist.model.User;
 
@@ -11,10 +13,12 @@ import java.util.List;
 @Service
 public class ShopListService {
     private final UserDAO userDAO;
+    private final ProductDAO productDAO;
     private final PurchaseDAO purchaseDAO;
 
-    public ShopListService(UserDAO userDAO, PurchaseDAO purchaseDAO) {
+    public ShopListService(UserDAO userDAO, ProductDAO productDAO, PurchaseDAO purchaseDAO) {
         this.userDAO = userDAO;
+        this.productDAO = productDAO;
         this.purchaseDAO = purchaseDAO;
     }
 
@@ -25,20 +29,25 @@ public class ShopListService {
         userDAO.save(user);
     }
 
-    public void savePurchase(User user, String purchaseTitle) {
-        Long userId = user.getId();
-        if (!userDAO.existsById(userId)) {
+    public void savePurchase(User user, String productName) {
+        if (!userDAO.existsById(user.getId())) {
             userDAO.save(user);
         }
 
+        Product product = productDAO.getByName(productName);
+
         Purchase purchase = new Purchase();
-        purchase.setUserId(userId);
-        purchase.setTitle(purchaseTitle);
+        purchase.setUser(user);
+        purchase.setProduct(product);
         purchaseDAO.save(purchase);
     }
 
-    public List<Purchase> getPurchasesByUserId(Long userId) {
-        return purchaseDAO.getByUserId(userId);
+    public List<Purchase> getPurchasesByUserId(Long userId, boolean onlyIncompleted) {
+        if (onlyIncompleted) {
+            return purchaseDAO.getIncompletedByUserId(userId);
+        } else {
+            return purchaseDAO.getAllByUserId(userId);
+        }
     }
 
     public void togglePurchase(Purchase purchase) {

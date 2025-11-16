@@ -11,8 +11,9 @@ import java.util.Date;
 @AllArgsConstructor
 public class Purchase {
     private Long id;
-    private Long userId;
-    private String title;
+    private User user;
+    private Product product;
     private boolean completed;
-    private Date addedAt;
+    private Date createdAt;
+    private Date updatedAt;
 }

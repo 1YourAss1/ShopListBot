@@ -22,9 +22,9 @@ public class PurchaseAction implements Action {
     @Override
     public boolean handle(Update update) {
         User user = update.getMessage().getFrom();
-        String purchaseTitle = update.getMessage().getText();
-        shopListService.savePurchase(user, purchaseTitle);
-        // TODO: TelegramService.sendMessage() to users in group except initiator
+        String productName = update.getMessage().getText();
+        shopListService.savePurchase(user, productName);
+        // TODO: TelegramService.sendMessageToGroup() to users in group except initiator
         return false;
     }
 

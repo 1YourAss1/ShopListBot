@@ -1,7 +1,8 @@
-  CREATE TABLE purchases (
+CREATE TABLE purchases (
     id BIGSERIAL PRIMARY KEY,
     user_id BIGINT REFERENCES users(id),
-    title VARCHAR,
+    product_id BIGINT REFERENCES products(id),
     completed BOOLEAN DEFAULT FALSE,
-    added_at TIMESTAMP
-  );
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP
+);

@@ -81,10 +81,9 @@ public class ShopListConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/static/**")
-                .addResourceLocations("/static/")
-                .resourceChain(true)
-                .addResolver(new PathResourceResolver());
+        registry
+                .addResourceHandler("/**")
+                .addResourceLocations("classpath:/static/");
     }
 
     @Bean
