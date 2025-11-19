@@ -3,6 +3,27 @@
     const userId = tg.initDataUnsafe.user.id;
     const initData = tg.initData;
 
+    const shopList = document.getElementById('shop-list');
+    const shopListCompleted = document.getElementById('shop-list-completed');
+
+    const overlay = document.getElementById('overlay');
+    const completedPanel = document.getElementById('completedPanel');
+    const completedHeader = document.getElementById('completedHeader');
+
+    completedHeader.addEventListener('click', () => {
+        const isOpen = completedPanel.classList.contains('open');
+        completedPanel.classList.toggle('open');
+        overlay.classList.toggle('active', !isOpen);
+        document.body.style.overflow = !isOpen ? 'hidden' : '';
+    });
+
+    overlay.addEventListener('click', () => {
+        completedPanel.classList.remove('open');
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+    });
+
+
     async function loadShopList() {
         try {
             const response = await fetch(`api/purchases/${userId}`, {
@@ -13,8 +34,8 @@
             });
             const purchases = await response.json();
 
-            const shopList = document.getElementById('shop-list');
             shopList.innerHTML = '';
+            shopListCompleted.innerHTML = '';
 
             if (purchases.length === 0) {
                 const shopItem = document.createElement('li');
@@ -29,8 +50,13 @@
                                 <input id="${purchase.id}" type="checkbox" class="checkbox" ${purchase.completed ? 'checked' : ''}>
                                 <label for="${purchase.id}" class="item-text">${purchase.product.name}</label>
                             `;
-
                     shopItem.addEventListener('change', async (event) => {
+                        const checkbox = event.target;
+                        const item = checkbox.closest('li');
+                        const checked = checkbox.checked;
+                        const checkedBefore = !checkbox.checked;
+
+                        moveItem(item, checked);
                         const response = await fetch(`api/toggle`, {
                             method: 'PATCH',
                             headers: {
@@ -38,20 +64,39 @@
                                 'Content-Type': 'application/json'
                             },
                             body: JSON.stringify({
-                                id: event.target.id,
-                                completed: event.target.checked
+                                id: checkbox.id,
+                                completed: checked
                             })
                         });
                         if (!response.ok) {
-                            event.target.checked = !completed;
+                            checkbox.checked = checkedBefore;
+                            moveItem(item, checkedBefore)
                             console.error('Не удалось обновить статус');
                         }
                     });
-                    shopList.appendChild(shopItem);
+
+                    if (purchase.completed) {
+                        shopListCompleted.appendChild(shopItem);
+                    } else {
+                        shopList.appendChild(shopItem);
+                    }
                 });
             }
         } catch (error) {
             console.log(error);
+        }
+    }
+
+    function moveItem(li, completed) {
+        li.classList.toggle('checked', completed);
+        li.querySelector('.checkbox')?.classList.toggle('checked', completed);
+
+        li.remove(); // убираем из текущего списка
+
+        if (completed) {
+            shopListCompleted.appendChild(li);
+        } else {
+            shopList.appendChild(li);
         }
     }
 

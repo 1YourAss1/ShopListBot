@@ -9,6 +9,7 @@ import ru.yourass.shoplist.model.Purchase;
 import ru.yourass.shoplist.model.User;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ShopListService {
@@ -35,22 +36,33 @@ public class ShopListService {
         }
 
         Product product = productDAO.getByName(productName);
+        Optional<Purchase> optPurchase = purchaseDAO.getByProductForUser(product, user);
 
-        Purchase purchase = new Purchase();
-        purchase.setUser(user);
-        purchase.setProduct(product);
-        purchaseDAO.save(purchase);
-    }
-
-    public List<Purchase> getPurchasesByUserId(Long userId, boolean onlyIncompleted) {
-        if (onlyIncompleted) {
-            return purchaseDAO.getIncompletedByUserId(userId);
+        if (optPurchase.isPresent()) {
+            Purchase purchase = optPurchase.get();
+            if (purchase.isCompleted()) {
+                purchaseDAO.updateComplete(purchase, false);
+            }
         } else {
-            return purchaseDAO.getAllByUserId(userId);
+            Purchase purchase = new Purchase();
+            purchase.setUser(user);
+            purchase.setProduct(product);
+            purchaseDAO.save(purchase);
         }
     }
 
+    /***
+     * Возвращает все незавершенные покупки и 10 последних завершенныйх
+     * @param userId Телеграм идентификатор пользователя
+     * @return список покупок для пользовал
+     */
+    public List<Purchase> getPurchasesByUserId(Long userId) {
+        List<Purchase> purchases = purchaseDAO.getIncompletedByUserId(userId);
+        purchases.addAll(purchaseDAO.getCompletedByUserId(userId, 10));
+        return purchases;
+    }
+
     public void togglePurchase(Purchase purchase) {
-        purchaseDAO.updateComplete(purchase.getId(), purchase.isCompleted());
+        purchaseDAO.updateComplete(purchase, purchase.isCompleted());
     }
 }
