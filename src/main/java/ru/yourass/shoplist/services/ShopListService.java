@@ -1,5 +1,6 @@
 package ru.yourass.shoplist.services;
 
+import jakarta.annotation.Nullable;
 import org.springframework.stereotype.Service;
 import ru.yourass.shoplist.dao.ProductDAO;
 import ru.yourass.shoplist.dao.PurchaseDAO;
@@ -30,19 +31,20 @@ public class ShopListService {
         userDAO.save(user);
     }
 
-    public void savePurchase(User user, String productName) {
+    public void savePurchase(User user, String productName, @Nullable Float quantity) {
         if (!userDAO.existsById(user.getId())) {
             userDAO.save(user);
         }
 
         Product product = productDAO.getByName(productName);
         Optional<Purchase> optPurchase = purchaseDAO.getByProductForUser(product, user);
-
         if (optPurchase.isPresent()) {
             Purchase purchase = optPurchase.get();
+            purchase.setQuantity(quantity);
             if (purchase.isCompleted()) {
-                purchaseDAO.updateComplete(purchase, false);
+                purchase.setCompleted(false);
             }
+            purchaseDAO.update(purchase);
         } else {
             Purchase purchase = new Purchase();
             purchase.setUser(user);
@@ -52,7 +54,7 @@ public class ShopListService {
     }
 
     /***
-     * Возвращает все незавершенные покупки и 10 последних завершенныйх
+     * Возвращает все незавершенные покупки и 10 последних завершенных
      * @param userId Телеграм идентификатор пользователя
      * @return список покупок для пользовал
      */
@@ -62,7 +64,7 @@ public class ShopListService {
         return purchases;
     }
 
-    public void togglePurchase(Purchase purchase) {
-        purchaseDAO.updateComplete(purchase, purchase.isCompleted());
+    public void updatePurchase(Purchase purchase) {
+        purchaseDAO.update(purchase);
     }
 }

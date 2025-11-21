@@ -48,7 +48,7 @@
                     shopItem.classList.add('item');
                     shopItem.innerHTML = `
                                 <input id="${purchase.id}" type="checkbox" class="checkbox" ${purchase.completed ? 'checked' : ''}>
-                                <label for="${purchase.id}" class="item-text">${purchase.product.name}</label>
+                                <label for="${purchase.id}" class="item-text">${purchase.product.name + getQuantityStr(purchase.quantity)}</label>
                             `;
                     shopItem.addEventListener('change', async (event) => {
                         const checkbox = event.target;
@@ -84,6 +84,14 @@
             }
         } catch (error) {
             console.log(error);
+        }
+    }
+
+    function getQuantityStr(quantity) {
+        if (quantity) {
+            return ` (${quantity})`;
+        } else {
+            return '';
         }
     }
 

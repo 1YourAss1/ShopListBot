@@ -33,7 +33,7 @@ public class PurchaseApiController {
     @PatchMapping(path = "/toggle", consumes = "application/json")
     public ResponseEntity<HttpStatus> updatePurchase(@RequestBody Purchase purchase) {
         try {
-            shopListService.togglePurchase(purchase);
+            shopListService.updatePurchase(purchase);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Server error", e);

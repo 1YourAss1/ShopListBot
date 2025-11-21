@@ -13,6 +13,7 @@ import ru.yourass.shoplist.model.User;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -21,9 +22,13 @@ import java.util.Optional;
 public class PurchaseDAO {
     private static final String USER_ID = "userId";
     private static final String COMPLETED = "completed";
+    private static final String CREATED_AT = "createdAt";
+    private static final String UPDATED_AT = "updatedAt";
+
     private static final String SQL_SELECT_PURCHASE = """
                         SELECT
                             purchases.id as "id",
+                            purchases.quantity as "quantity",
                             purchases.completed as "completed",
                             purchases.created_at as "created_at",
                             purchases.updated_at as "updated_at",
@@ -76,8 +81,8 @@ public class PurchaseDAO {
                         .addValue(USER_ID, purchase.getUser().getId())
                         .addValue("productId", purchase.getProduct().getId())
                         .addValue(COMPLETED, purchase.isCompleted())
-                        .addValue("createdAt", LocalDateTime.now())
-                        .addValue("updatedAt", LocalDateTime.now()));
+                        .addValue(CREATED_AT, LocalDateTime.now())
+                        .addValue(UPDATED_AT, LocalDateTime.now()));
     }
 
     public List<Purchase> getAllByUserId(Long userId) {
@@ -116,17 +121,18 @@ public class PurchaseDAO {
                 new PurchaseProductRowMapper());
     }
 
-    public void updateComplete(Purchase purchase, boolean complete) {
+    public void update(Purchase purchase) {
         String sql = """
             UPDATE purchases
-            SET completed = :completed, updated_at = :updated_at
+            SET completed = :completed, updated_at = :updatedAt, quantity = :quantity
             WHERE id = :id
         """;
-        var params = new MapSqlParameterSource()
-                .addValue(COMPLETED, complete)
-                .addValue("updated_at", LocalDateTime.now())
-                .addValue("id", purchase.getId());
-        int rows = jdbcTemplate.update(sql, params);
+
+        int rows = jdbcTemplate.update(sql, new MapSqlParameterSource()
+                .addValue(COMPLETED, purchase.isCompleted())
+                .addValue(UPDATED_AT, LocalDateTime.now())
+                .addValue("quantity", purchase.getQuantity())
+                .addValue("id", purchase.getId()));
         if (rows != 1) {
             throw new JdbcUpdateAffectedIncorrectNumberOfRowsException(sql, 1, rows);
         }
@@ -149,11 +155,12 @@ public class PurchaseDAO {
 
             Purchase purchase = new Purchase();
             purchase.setId(rs.getLong("id"));
+            purchase.setUser(user);
+            purchase.setProduct(product);
+            purchase.setQuantity(rs.getFloat("quantity"));
             purchase.setCompleted(rs.getBoolean(COMPLETED));
             purchase.setCreatedAt(rs.getTimestamp("created_at"));
             purchase.setUpdatedAt(rs.getTimestamp("updated_at"));
-            purchase.setUser(user);
-            purchase.setProduct(product);
 
             return purchase;
         }
