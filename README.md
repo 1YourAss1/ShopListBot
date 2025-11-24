@@ -7,4 +7,9 @@ shared.loader=${catalina.base}/shared/classes
 ```xml
 shop.list.bot.token=<telegram-bot-token>
 shop.list.bot.webhook.url=<server-domain-name>/shop-list-bot/webhook
+    
+db.driverClassName=org.postgresql.Driver
+db.url=<database-url>
+db.username=<database-username>
+db.password=<database-admin>
 ```
