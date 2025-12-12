@@ -25,11 +25,16 @@ public class ShopListController {
     @PostConstruct
     public void init() {
         telegramService.registerWebhook();
+        telegramService.setCommands();
     }
     
     @PostMapping(value = "/")
     public ResponseEntity<HttpStatus> handleWebhook(@RequestBody Update update) {
-        actionDispatcher.dispatch(update);
+        try {
+            actionDispatcher.dispatch(update);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
         return ResponseEntity.ok().build();
     }
 

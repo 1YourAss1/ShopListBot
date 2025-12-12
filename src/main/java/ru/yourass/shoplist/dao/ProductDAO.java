@@ -10,8 +10,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yourass.shoplist.model.Product;
 
-import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Objects;
 
 @Component
@@ -33,7 +31,6 @@ public class ProductDAO {
         } catch (EmptyResultDataAccessException e) {
             Product product = new Product();
             product.setName(normalizedName);
-            product.setCreatedAt(new Date());
             product.setId(this.save(product));
             return product;
         }
@@ -41,13 +38,11 @@ public class ProductDAO {
 
     public Long save(Product product) {
         String sql = """
-        INSERT INTO products (name, created_at)\s
-        VALUES (:name, :createdAt)
+            INSERT INTO products (name)
+            VALUES (:name)
         """;
 
-        MapSqlParameterSource params = new MapSqlParameterSource()
-                .addValue("name", product.getName())
-                .addValue("createdAt", LocalDateTime.now());
+        MapSqlParameterSource params = new MapSqlParameterSource("name", product.getName());
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(sql, params, keyHolder, new String[]{"id"});

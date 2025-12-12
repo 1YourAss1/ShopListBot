@@ -1,5 +1,5 @@
-CREATE TABLE products (
+CREATE TABLE groups (
     id BIGSERIAL PRIMARY KEY,
-    name VARCHAR,
+    owner_id BIGINT REFERENCES users(id),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

@@ -1,5 +1,7 @@
 package ru.yourass.shoplist.services;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,49 +26,111 @@ import java.util.stream.Collectors;
 public class TelegramService {
     private static final Logger logger = LoggerFactory.getLogger(TelegramService.class);
     private static final Duration MAX_AGE = Duration.ofMinutes(10);
+    private final String apiUrl;
+    private final String botToken;
 
     private final RestTemplate restTemplate;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @Value("${bot.token}")
-    private String botToken;
 
     @Value("${bot.webhook.url}")
     private String webhookUrl;
 
-    public TelegramService(RestTemplate restTemplate) {
+    public TelegramService(RestTemplate restTemplate, @Value("${bot.token}") String botToken) {
         this.restTemplate = restTemplate;
-    }
-
-    public void sendMessage(long chatId, String text) {
-        URI url = URI.create("https://api.telegram.org/bot" + botToken + "/sendMessage");
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        Map<String, Object> body = Map.of(
-                "chat_id", chatId,
-                "text", text
-        );
-
-        ResponseEntity<String> resp = restTemplate.postForEntity(
-                url,
-                new HttpEntity<>(body, headers),
-                String.class
-        );
-
-        if (!resp.getStatusCode().is2xxSuccessful()) {
-            throw new IllegalStateException("Telegram API error: HTTP " +
-                    resp.getStatusCode().value() + " — " + resp.getBody());
-        }
+        this.botToken = botToken;
+        this.apiUrl = "https://api.telegram.org/bot" + this.botToken;
     }
 
     public void registerWebhook() {
-        String telegramApiUrl = "https://api.telegram.org/bot" + botToken + "/setWebhook?url=" + webhookUrl;
+        String telegramApiUrl = apiUrl + "/setWebhook?url=" + webhookUrl;
         ResponseEntity<String> response = restTemplate.postForEntity(telegramApiUrl, null, String.class);
         if (!HttpStatus.OK.equals(response.getStatusCode())) {
             throw new ResponseStatusException(response.getStatusCode(), response.getBody());
         }
     }
+
+    private void exchangeHttpEntity(URI url, HttpEntity<String> requestEntity) {
+        try {
+            ResponseEntity<String> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    requestEntity,
+                    String.class
+            );
+            logger.debug(response.getBody());
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+    public void sendMessage(long chatId, String text) {
+        this.sendMessage(chatId, text, Collections.emptyList());
+    }
+
+    public void sendMessage(long chatId, String text, List<Map<String, String>> inlineButtons) {
+        URI url = URI.create(apiUrl + "/sendMessage");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        String jsonBody = "";
+        try {
+            var request = new HashMap<>();
+            request.put("chat_id", String.valueOf(chatId));
+            request.put("text", text);
+            request.put("parse_mode", "MarkdownV2");
+            if (!inlineButtons.isEmpty()) {
+                request.put("reply_markup", this.getInlineKeyboardMarkup(inlineButtons));
+            }
+            jsonBody = objectMapper.writeValueAsString(request);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+
+        this.exchangeHttpEntity(url, new HttpEntity<>(jsonBody, headers));
+    }
+
+    private record InlineKeyboardMarkup(@JsonProperty("inline_keyboard") List<List<InlineKeyboardButton>> inlineKeyboard) {}
+
+    private record InlineKeyboardButton(String text, @JsonProperty("callback_data") String callbackData) {}
+
+    private InlineKeyboardMarkup getInlineKeyboardMarkup(List<Map<String, String>> inlineButtons) {
+        List<List<InlineKeyboardButton>> inlineKeyboard =  new ArrayList<>();
+        inlineButtons.forEach((button) -> {
+            List<InlineKeyboardButton> row = new ArrayList<>();
+            button.forEach((key, value) -> {
+                row.add(new InlineKeyboardButton(key, value));
+            });
+            inlineKeyboard.add(row);
+        });
+        return new InlineKeyboardMarkup(inlineKeyboard);
+    }
+
+    public void setCommands() {
+        URI url = URI.create(apiUrl + "/setMyCommands");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        String jsonBody = "";
+        try {
+            var request = new BotCommands(List.of(
+                    new BotCommand("/status", "Статус группы"),
+                    new BotCommand("/invite", "Пригласить в группу"),
+                    new BotCommand("/leave", "Покинуть группу")
+            ), "ru");
+            jsonBody = objectMapper.writeValueAsString(request);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+
+        this.exchangeHttpEntity(url, new HttpEntity<>(jsonBody, headers));
+    }
+
+    private record BotCommand(String command, String description) {}
+
+    private record BotCommands(List<BotCommand> commands, @JsonProperty("language_code") String languageCode) {}
 
     public void validateInitData(String initDataHeader) {
         if (initDataHeader == null || initDataHeader.isBlank() || !initDataHeader.startsWith("tma ")) {

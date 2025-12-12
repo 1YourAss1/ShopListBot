@@ -1,6 +1,5 @@
 package ru.yourass.shoplist.action;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
 import ru.yourass.shoplist.model.User;
@@ -8,15 +7,15 @@ import ru.yourass.shoplist.services.ShopListService;
 import ru.yourass.shoplist.services.TelegramService;
 
 import java.util.Locale;
+import java.util.Optional;
 
-@Slf4j
 @Component
-public class StartAction implements Action {
+public class StatusAction implements Action {
     private final ShopListService shopListService;
     private final TelegramService telegramService;
     private final MessageSource messageSource;
 
-    public StartAction(ShopListService shopListService, TelegramService telegramService, MessageSource messageSource) {
+    public StatusAction(ShopListService shopListService, TelegramService telegramService, MessageSource messageSource) {
         this.shopListService = shopListService;
         this.telegramService = telegramService;
         this.messageSource = messageSource;
@@ -24,25 +23,28 @@ public class StartAction implements Action {
 
     @Override
     public String getKey() {
-        return "/start";
+        return "/status";
     }
 
     @Override
     public boolean handle(User user, String data) {
-        try {
-            shopListService.saveUser(user, false);
+        Optional<String> groupStatusString = shopListService.getGroupStatusString(user);
+        if (groupStatusString.isPresent()) {
             telegramService.sendMessage(user.getId(), messageSource.getMessage(
-                    "message.start",
-                    new Object[]{user.toString()},
+                    "message.status.group",
+                    new Object[]{groupStatusString.get()},
                     Locale.getDefault()));
-        } catch (Exception e) {
-            log.error(e.getMessage());
+        } else {
+            telegramService.sendMessage(user.getId(), messageSource.getMessage(
+                    "message.status.empty",
+                    new Object[]{},
+                    Locale.getDefault()));
         }
         return false;
     }
 
     @Override
     public boolean callback(User user, String data) {
-        return true;
+        return false;
     }
 }

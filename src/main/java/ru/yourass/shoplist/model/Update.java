@@ -9,18 +9,26 @@ public class Update {
     @JsonProperty("update_id")
     private Long updateId;
 
-    @JsonProperty("message")
     private Message message;
+
+    @JsonProperty("callback_query")
+    private CallbackQuery callbackQuery;
 
     @Getter
     @Setter(AccessLevel.PROTECTED)
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Message {
-        @JsonProperty("from")
         private User from;
-
-        @JsonProperty("text")
         private String text;
+    }
+
+    @Getter
+    @Setter(AccessLevel.PROTECTED)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CallbackQuery {
+        private User from;
+        private String data;
     }
 }

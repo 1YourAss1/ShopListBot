@@ -31,8 +31,10 @@ public class UserDAO {
 
     public void save(User user) {
         String sql = """
-            INSERT INTO users (id, username, first_name, last_name, created_at)\s
-            VALUES (:id, :userName, :firstName, :lastName, :createdAt)
+            INSERT INTO users (id, username, first_name, last_name, created_at) 
+            VALUES (:id, :userName, :firstName, :lastName, :createdAt) 
+            ON CONFLICT (id) DO UPDATE 
+                SET username = :userName, first_name = :firstName, last_name = :lastName
            """;
         jdbcTemplate.update(sql,
                 new MapSqlParameterSource()

@@ -1,25 +1,24 @@
 package ru.yourass.shoplist.action;
 
-import ru.yourass.shoplist.model.Update;
+import ru.yourass.shoplist.model.User;
 
 public interface Action {
     /**
-     *
-     * @return telegram action key (start with /)
+     * @return telegram команда (start with /)
      */
     String getKey();
 
     /**
-     *
-     * @param update telegram update
-     * @return true if waiting callback
+     * @param user пользователь
+     * @param data текстовые данные
+     * @return true, если ожидается callback
      */
-    boolean handle(Update update);
+    boolean handle(User user, String data);
 
     /**
-     *
-     * @param update telegram update
-     * @return true if success
+     * @param user пользователь
+     * @param data текстовые данные
+     * @return true, если успешно отработан
      */
-    boolean callback(Update update);
+    boolean callback(User user, String data);
 }

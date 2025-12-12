@@ -41,7 +41,7 @@
                 shopItem.classList.add('item');
                 shopItem.innerHTML = `
                             <input id="${purchase.id}" type="checkbox" class="checkbox" ${purchase.completed ? 'checked' : ''}>
-                            <label for="${purchase.id}" class="item-text">${purchase.product.name + getQuantityStr(purchase.quantity)}</label>
+                            <label for="${purchase.id}" class="item-text">${capitalizeFirstLetter(purchase.product.name) + getQuantityStr(purchase.quantity) + getFioString(purchase.user)}</label>
                         `;
                 shopItem.addEventListener('change', async (event) => {
                     const checkbox = event.target;
@@ -80,12 +80,29 @@
         }
     }
 
+    function capitalizeFirstLetter(val) {
+        return String(val).charAt(0).toUpperCase() + String(val).slice(1);
+    }
+
     function getQuantityStr(quantity) {
         if (quantity) {
             return ` (${quantity})`;
         } else {
             return '';
         }
+    }
+
+    function getFioString(user) {
+        let fioString = ` (${user.id})`;
+        if (user.first_name) {
+            fioString = ` (${user.first_name})`;
+            if (user.last_name) {
+                fioString = ` (${user.first_name} ${user.last_name})`;
+            }
+        } else if (user.username) {
+            fioString = ` (${user.username})`;
+        }
+        return fioString;
     }
 
     function moveItem(li, completed) {
