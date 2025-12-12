@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Список покупок</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <ul id="shop-list" class="list">
+        <li id="shop-list-empty-item" class="item">
+            <label class="item-text">Пусто &#128549;</label>
+        </li>
+    </ul>
+
+    <div class="overlay" id="overlay"></div>
+
+    <div class="completed-panel" id="completedPanel">
+        <div class="completed-panel-header" id="completedHeader">
+            <h2>Выполненные покупки</h2>
+        </div>
+        <ul id="shop-list-completed" class="list">
+            <li id="shop-list-completed-empty-item" class="item">
+                <label class="item-text">Пусто &#128549;</label>
+            </li>
+        </ul>
+    </div>
+
+    <script src="js/listLoader.js" defer></script>
+</body>
+</html>
