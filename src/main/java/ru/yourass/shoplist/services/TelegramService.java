@@ -97,11 +97,9 @@ public class TelegramService {
 
     private InlineKeyboardMarkup getInlineKeyboardMarkup(List<Map<String, String>> inlineButtons) {
         List<List<InlineKeyboardButton>> inlineKeyboard =  new ArrayList<>();
-        inlineButtons.forEach((button) -> {
+        inlineButtons.forEach(button -> {
             List<InlineKeyboardButton> row = new ArrayList<>();
-            button.forEach((key, value) -> {
-                row.add(new InlineKeyboardButton(key, value));
-            });
+            button.forEach((key, value) -> row.add(new InlineKeyboardButton(key, value)));
             inlineKeyboard.add(row);
         });
         return new InlineKeyboardMarkup(inlineKeyboard);

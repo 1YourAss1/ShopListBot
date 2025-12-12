@@ -30,8 +30,6 @@ class ShopListServiceTest {
 
     private User user;
     private User owner;
-    private User otherUser;
-    private Group userGroup;
     private Group ownerGroup;
     private Group otherGroup;
 
@@ -41,10 +39,10 @@ class ShopListServiceTest {
         user.setId(1L);
         owner = new User();
         owner.setId(2L);
-        otherUser = new User();
+        User otherUser = new User();
         otherUser.setId(3L);
 
-        userGroup = new Group();
+        Group userGroup = new Group();
         userGroup.setOwner(user);
         ownerGroup = new Group();
         ownerGroup.setOwner(owner);

@@ -2,12 +2,6 @@ package ru.yourass.shoplist.action;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-import ru.yourass.shoplist.dao.GroupDAO;
-import ru.yourass.shoplist.dao.GroupMemberDAO;
-import ru.yourass.shoplist.dao.UserDAO;
-import ru.yourass.shoplist.model.Group;
-import ru.yourass.shoplist.model.GroupMember;
 import ru.yourass.shoplist.model.Update;
 import ru.yourass.shoplist.model.User;
 import ru.yourass.shoplist.services.ShopListService;
