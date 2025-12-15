@@ -1,0 +1,5 @@
+CREATE TABLE groups (
+    id BIGSERIAL PRIMARY KEY,
+    owner_id BIGINT REFERENCES users(id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

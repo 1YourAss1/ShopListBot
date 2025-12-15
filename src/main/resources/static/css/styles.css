@@ -1,0 +1,120 @@
+:root{
+    --bg: #f7f7f9;
+    --card: #ffffff;
+    --muted: #6b7280;
+    --accent: #1f6feb;
+    --tg-font-main: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --tg-font-mono: ui-monospace, "SF Mono", Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+
+body {
+    font-family: var(--tg-font-main);
+    font-feature-settings: "pnum" on, "lnum" on; /* как в Telegram */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.item {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--tg-theme-secondary-bg-color, #f4f4f5);
+    background: var(--tg-theme-bg-color, #ffffff);
+}
+
+.item:last-child {
+    border-bottom: none;
+}
+
+.item-text {
+    color: var(--tg-theme-text-color, #000000);
+    font-size: 18px;
+    flex-grow: 1;
+}
+
+.item-text.checked {
+    text-decoration: line-through;
+    opacity: 0.6;
+}
+
+.checkbox {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--tg-theme-text-color, #000000);
+    border-radius: 4px;
+    margin-right: 12px;
+    position: relative;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.checkbox input {
+    display: none;
+}
+
+.checkbox.checked {
+    background: var(--tg-theme-button-color, #2481cc);
+    border-color: var(--tg-theme-button-color, #2481cc);
+}
+
+.checkbox.checked::after {
+    content: "✓";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--tg-theme-button-text-color, #ffffff);
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.3);
+    backdrop-filter: blur(8px);
+    pointer-events: none;
+    z-index: 90;
+    opacity: 0;
+    transition: opacity .35s ease;
+}
+.overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.completed-panel {
+    position:fixed;
+    bottom:0;
+    left:0;
+    right:0;
+    background: var(--tg-theme-bg-color, #ffffff);
+    border-radius:20px 20px 0 0;
+    box-shadow:0 -10px 40px var(--tg-theme-secondary-bg-color, #f4f4f5);
+    z-index: 100;
+    height: 10vh;
+    overflow: hidden;
+    transition: height .45s cubic-bezier(.32,0,.1,1);
+}
+.completed-panel.open {
+    height: 90vh;
+}
+
+.completed-panel-header {
+    height: 10vh;
+    line-height: 10vh;
+    text-align: center;
+    /*border-radius: 20px 20px 0 0;*/
+    cursor: pointer;
+    user-select: none;
+    z-index: 100;
+}
+.completed-panel-header h2 {
+    margin: 0; font-size: 19px; font-weight: 600; color: var(--tg-theme-text-color, #000000);
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+}
