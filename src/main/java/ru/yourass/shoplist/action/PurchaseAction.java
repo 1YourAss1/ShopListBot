@@ -50,7 +50,7 @@ public class PurchaseAction implements Action {
                             User groupMemberUser = groupMember.getUser();
                             telegramService.sendMessage(groupMemberUser.getId(), messageSource.getMessage(
                                     "message.purchase.add",
-                                    new Object[]{groupMemberUser.toString(), data},
+                                    new Object[]{user.toString(), data},
                                     Locale.getDefault()));
                         });
             }
